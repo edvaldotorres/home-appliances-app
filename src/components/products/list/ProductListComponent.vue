@@ -23,22 +23,22 @@
         class=""
       >
         <div class="row border-bottom border-top p-2 bg-light">
-          <div class="col-1">
+          <div class="col-1 bold-column">
             #
           </div>
-          <div class="col-2">
+          <div class="col-2 bold-column">
             Nome do Produto
           </div>
-          <div class="col-2">
+          <div class="col-2 bold-column">
             Descrição
           </div>
-          <div class="col-2">
+          <div class="col-2 bold-column">
             Tensão
           </div>
-          <div class="col-2">
+          <div class="col-2 bold-column">
             Marca
           </div>
-          <div class="col-2">
+          <div class="col-2 bold-column">
             Ações
           </div>
         </div>
@@ -127,3 +127,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.bold-column {
+  font-weight: bold;
+}
+</style>
