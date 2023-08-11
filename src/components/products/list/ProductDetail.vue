@@ -10,7 +10,7 @@
       {{ product.description }}
     </div>
     <div class="col-2">
-      <strong class="text-danger">{{ product.tension }} V</strong>
+      <strong class="text-danger">{{ product.tension }}V</strong>
     </div>
     <div class="col-2">
       {{ product.mark.name }}

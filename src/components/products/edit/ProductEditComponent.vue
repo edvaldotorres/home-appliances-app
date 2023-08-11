@@ -15,10 +15,10 @@
                 class="spinner-border text-primary"
                 role="status"
               >
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">Carregando...</span>
               </div>
               <br>
-              Loading Product Details
+              Carregando Detalhes do Produto
             </div>
           </div>
           <div v-if="product !== null && !isLoading">
