@@ -1,58 +1,53 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue';
-import Helper from '../views/Helper.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 import NProgress from 'nprogress';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: () => import(/* webpackChunkName: "home" */ '../views/Home.vue')
   },
   {
     path: '/help',
     name: 'Help',
-    component: Helper
+    component: () => import(/* webpackChunkName: "help" */ '../views/Helper.vue')
   },
   {
     path: '/about',
     name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
     path: '/products',
     name: 'Products',
-    component: () => import('../views/products/ProductList.vue')
+    component: () => import(/* webpackChunkName: "products" */ '../views/products/ProductList.vue')
   },
   {
     path: '/products/create',
-    name: 'Product Create',
-    component: () => import('../views/products/ProductCreate.vue')
+    name: 'ProductCreate',
+    component: () => import(/* webpackChunkName: "products" */ '../views/products/ProductCreate.vue')
   },
   {
     path: '/products/edit/:id',
     name: 'ProductEdit',
-    component: () => import('../views/products/ProductEdit.vue')
+    component: () => import(/* webpackChunkName: "products" */ '../views/products/ProductEdit.vue')
   }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
 
 router.beforeResolve((to, from, next) => {
   if (to.name) {
-      NProgress.start()
+    NProgress.start();
   }
-  next()
+  next();
 });
 
 router.afterEach(() => {
-  NProgress.done()
+  NProgress.done();
 });
 
-export default router
+export default router;
