@@ -7,8 +7,9 @@
             to="/products"
             class="btn btn-primary p-4 dashboard-widget"
           >
-            Listar Produtos
-            <br>
+            <div style="display: block">
+              Listar Produtos
+            </div>
             <span
               v-if="productsPaginatedData !== null"
               class="badge badge-info"
@@ -28,7 +29,7 @@
       </div>
     </div>
     <div>
-      <product-list-component />
+      <ProductListComponent />
     </div>
   </div>
 </template>
@@ -42,7 +43,9 @@ export default {
 
   components: { ProductListComponent },
 
-  computed: { ...mapGetters(["productsPaginatedData"]) },
+  computed: {
+    ...mapGetters(["productsPaginatedData"]),
+  },
 
   created() {
     this.fetchAllProducts(1);
