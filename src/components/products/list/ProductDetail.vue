@@ -65,13 +65,12 @@ export default {
           showCancelButton: true,
           reverseButtons: true,
         })
-        .then(async result => {
+        .then(async (result) => {
           if (result["isConfirmed"]) {
-            // Put delete logic
             await this.deleteProduct(id);
             this.fetchAllProducts({
               page: 1,
-              search: ''
+              search: "",
             });
             this.$swal.fire({
               text: "Produto deletado com sucesso!",

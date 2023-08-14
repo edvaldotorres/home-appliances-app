@@ -42,7 +42,6 @@
             Ações
           </div>
         </div>
-
         <div
           v-for="(item, index) in productsPaginatedData"
           :key="item.id"
@@ -53,22 +52,19 @@
           />
         </div>
       </div>
-
       <div
         v-if="isLoading"
         class="text-center mt-5 mb-5"
       >
-        Loading Products...
+        Carregano Produtos...
         <div
           class="spinner-grow"
           role="status"
         >
-          <span class="sr-only">Loading...</span>
+          <span class="sr-only">Carregando...</span>
         </div>
       </div>
     </div>
-
-    <!-- Insert Pagination Part -->
     <div
       v-if="productsPaginatedData !== null"
       class="vertical-center mt-2 mb-5"
@@ -96,6 +92,7 @@ export default {
     ProductDetail,
     VPagination,
   },
+  
   data() {
     return {
       query: {
@@ -104,7 +101,10 @@ export default {
       },
     };
   },
-  computed: { ...mapGetters(["productList", "productsPaginatedData", "isLoading"]) },
+
+  computed: {
+    ...mapGetters(["productList", "productsPaginatedData", "isLoading"]),
+  },
 
   methods: {
     ...mapActions(["fetchAllProducts"]),

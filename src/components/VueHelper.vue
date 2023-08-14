@@ -1,8 +1,8 @@
 <template>
   <div class="vue-helper">
     <p>
-      Para obter um guia e receitas sobre como configurar/personalizar este projeto,
-      confira a 
+      Para obter um guia e receitas sobre como configurar/personalizar este
+      projeto, confira a
       <a
         href="https://cli.vuejs.org"
         target="_blank"
@@ -115,7 +115,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;

@@ -5,12 +5,10 @@
         <h6>Adicionar Produto</h6>
       </div>
       <div class="card-body">
-        <!-- <form v-on:submit.prevent="onSaveProduct" :validation-schema="schema"> -->
         <VeeForm
           :validation-schema="schema"
           @submit="onSubmit"
         >
-          <!-- <Form @submit="onSaveProduct" :validation-schema="schema"> -->
           <div class="form-group row my-1">
             <div class="col-6">
               <label>Nome do Produto:</label>
@@ -41,24 +39,25 @@
             </div>
             <div class="col-3">
               <label>Marca:</label>
-              <select
+              <Field
                 v-model="selectedMarkId"
+                name="selectedMarkId"
+                as="select"
                 class="form-control"
               >
                 <option value="">
-                  Select a brand
+                  Selecione a marca
                 </option>
                 <option
-                  v-for="brand in marks"
-                  :key="brand.id"
-                  :value="brand.id"
+                  v-for="mark in marks"
+                  :key="mark.id"
+                  :value="mark.id"
                 >
-                  {{ brand.name }}
+                  {{ mark.name }}
                 </option>
-              </select>
+              </Field>
               <ErrorMessage
-                v-if="selectedBrand === null"
-                name="selectedBrand"
+                name="selectedMarkId"
                 class="text-capitalize text-danger"
               />
             </div>
@@ -124,11 +123,16 @@ export default {
   },
 
   setup() {
-    // Define a validation schema
     const schema = yup.object({
-      name: yup.string().required().min(5),
-      tension: yup.string().required(),
-      description: yup.string().required().min(5),
+      name: yup
+        .string()
+        .required("O campo nome é obrigatório")
+        .min(3, "O nome deve ter pelo menos 3 caracteres"),
+      tension: yup
+        .number("O campo tensão deve ser um número")
+        .required("O campo tensão é obrigatório"),
+      selectedMarkId: yup.string().required("Selecione uma marca"),
+      description: yup.string(),
     });
 
     return {
@@ -139,7 +143,7 @@ export default {
   data() {
     return {
       product: {},
-      selectedMarkId: null
+      selectedMarkId: "",
     };
   },
 
@@ -179,7 +183,7 @@ export default {
 
   // eslint-disable-next-line vue/order-in-components
   mounted() {
-    this.init(); 
+    this.init();
   },
 };
 </script>

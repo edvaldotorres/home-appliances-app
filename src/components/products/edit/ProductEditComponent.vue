@@ -54,24 +54,25 @@
               </div>
               <div class="col-3">
                 <label>Marca:</label>
-                <select
-                  v-model="selectedMarkId"
+                <Field
+                  v-model="product.mark.id"
+                  name="selectedMarkId"
+                  as="select"
                   class="form-control"
                 >
                   <option value="">
-                    Selecione uma marca
+                    Selecione a marca
                   </option>
                   <option
-                    v-for="brand in marks"
-                    :key="brand.id"
-                    :value="brand.id"
+                    v-for="mark in marks"
+                    :key="mark.id"
+                    :value="mark.id"
                   >
-                    {{ brand.name }}
+                    {{ mark.name }}
                   </option>
-                </select>
+                </Field>
                 <ErrorMessage
-                  v-if="selectedBrand === null"
-                  name="selectedBrand"
+                  name="selectedMarkId"
                   class="text-capitalize text-danger"
                 />
               </div>
@@ -137,12 +138,18 @@ export default {
     VeeForm,
     ErrorMessage,
   },
+
   setup() {
-    // Define a validation schema
     const schema = yup.object({
-      name: yup.string().required().min(5),
-      tension: yup.string().required(),
-      description: yup.string().required().min(5),
+      name: yup
+        .string()
+        .required("O campo nome é obrigatório")
+        .min(3, "O nome deve ter pelo menos 3 caracteres"),
+      tension: yup
+        .number("O campo tensão deve ser um número")
+        .required("O campo tensão é obrigatório"),
+      selectedMarkId: yup.string().required("Selecione uma marca"),
+      description: yup.string(),
     });
 
     return {
@@ -157,7 +164,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["isUpdating", "updatedData", "product", "isLoading"]),
+    ...mapGetters([
+      "isUpdating",
+      "updatedData",
+      "product",
+      "isLoading",
+      "marks",
+    ]),
   },
 
   watch: {
@@ -176,6 +189,7 @@ export default {
   },
 
   created: function () {
+    this.init();
     this.id = this.$route.params.id;
     this.fetchDetailProduct(this.id);
   },
@@ -185,7 +199,13 @@ export default {
       "updateProduct",
       "updateProductInput",
       "fetchDetailProduct",
+      "fetchAllMarks",
     ]),
+
+    async init() {
+      await this.fetchAllMarks();
+    },
+
     onSubmit() {
       const { name, tension, description } = this.product;
       this.updateProduct({
@@ -193,8 +213,10 @@ export default {
         name: name,
         tension: tension,
         description: description,
+        mark_id: this.product.mark.id
       });
     },
+    
     updateProductInputAction(e) {
       this.updateProductInput(e);
     },

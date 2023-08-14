@@ -22,7 +22,7 @@
             to="/products/create"
             class="nav-link"
           >
-            <i class="fa fa-plus-circle" /> 
+            <i class="fa fa-plus-circle" />
             Adicionar
           </router-link>
         </li>
