@@ -1,7 +1,8 @@
 // import { GET_ALL_PRODUCTS } from "./Types";
-import axios from 'axios';
+import axios from "axios";
+import { $http } from "../../http";
 
-// initial state
+// initial state //TODO: State deve estar em um arquivo separado
 const state = () => ({
   products: [],
   productsPaginatedData: null,
@@ -13,190 +14,212 @@ const state = () => ({
   updatedData: null,
   isDeleting: false,
   deletedData: null,
-  marks: []
-})
+  marks: [],
+});
 
-// getters
+// getters //TODO: getters deve estar em um arquivo separado
 const getters = {
-  productList: state => state.products,
-  productsPaginatedData: state => state.productsPaginatedData,
-  product: state => state.product,
-  isLoading: state => state.isLoading,
-  isCreating: state => state.isCreating,
-  isUpdating: state => state.isUpdating,
-  createdData: state => state.createdData,
-  updatedData: state => state.updatedData,
+  productList: (state) => state.products,
+  productsPaginatedData: (state) => state.productsPaginatedData,
+  product: (state) => state.product,
+  isLoading: (state) => state.isLoading,
+  isCreating: (state) => state.isCreating,
+  isUpdating: (state) => state.isUpdating,
+  createdData: (state) => state.createdData,
+  updatedData: (state) => state.updatedData,
 
-  isDeleting: state => state.isDeleting,
-  deletedData: state => state.deletedData,
-  marks: state => state.marks
+  isDeleting: (state) => state.isDeleting,
+  deletedData: (state) => state.deletedData,
+  marks: (state) => state.marks,
 };
 
-// actions
+const services = {
+  products: "products",
+};
+
+// TODO: Criar um arquivo e adicionar esse objeto types 👇
+export const types = Object.freeze({
+  SET_PRODUCTS: "setProducts",
+  SET_PRODUCTS_PAGINATED: "setProductsPaginated",
+  SET_PRODUCT_DETAIL: "setProductDetail",
+  SET_DELETE_PRODUCT: "setDeleteProduct",
+  SET_PRODUCT_DETAIL_INPUT: "setProductDetailInput",
+  SAVE_NEW_PRODUCTS: "saveNewProducts",
+  SAVE_UPDATED_PRODUCT: "saveUpdatedProduct",
+  SET_PRODUCT_IS_LOADING: "setProductIsLoading",
+  SET_PRODUCT_IS_CREATING: "setProductIsCreating",
+  SET_PRODUCT_IS_UPDATING: "setProductIsUpdating",
+  SET_PRODUCT_IS_DELETING: "setProductIsDeleting",
+  SET_MARKS: "setMarks",
+});
+
+// actions //TODO: Actions deve estar em um arquivo separado
 const actions = {
-  async fetchAllProducts({ commit }, query = null) {
-    let page = 1;
-    let search = '';
-    if (query !== null) {
-      page = query?.page || 1;
-      search = query?.search || '';
-    }
+  async fetchAllProducts({ commit }, query = {}) {
+    // If a search query is present, force the page to be 1
+    const params = {
+      page: query?.search ? 1 : (query?.page || 1),
+      search: query?.search || "",
+    };
 
-    commit('setProductIsLoading', true);
-    let url = `${process.env.VUE_APP_API_URL}products`;
-    if (!search) {
-      url = `${url}?page=${page}`;
-    } else {
-      url = `${process.env.VUE_APP_API_URL}products/view/search?search=${search}&page=${page}`
+    commit("setProductIsLoading", true);
+    try {
+      const { data } = await $http.get(services.products, { params });
+      const products = data.data;
+      commit("setProducts", products);
+      const pagination = {
+        total: data.meta.total,
+        per_page: data.meta.per_page,
+        current_page: data.meta.current_page,
+        total_pages: data.meta.last_page,
+      };
+      products.pagination = pagination;
+      commit("setProductsPaginated", products);
+    } catch (error) {
+      console.error("error", error);
+    } finally {
+      commit("setProductIsLoading", false);
     }
-
-    await axios.get(url)
-      .then(({
-        data: { data, meta: { total, current_page, last_page, per_page } }
-      }) => {
-        const products = data;
-        commit('setProducts', products);
-        const pagination = {
-          total,                  // total number of elements or items
-          per_page,               // items per page
-          current_page,           // current page (it will be automatically updated when users clicks on some page number).
-          total_pages: last_page  // total pages in record
-        }
-        data.pagination = pagination;
-        commit('setProductsPaginated', data);
-        commit('setProductIsLoading', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsLoading', false);
-      });
   },
 
   async fetchDetailProduct({ commit }, id) {
-    commit('setProductIsLoading', true);
-    await axios.get(`${process.env.VUE_APP_API_URL}products/${id}`)
-      .then(res => {
-        commit('setProductDetail', res.data.data);
-        commit('setProductIsLoading', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsLoading', false);
+    commit("setProductIsLoading", true);
+    await axios // TODO: Trocar axios por $http e adicionar o parâmetro "id" a query do $http
+      .get(`${process.env.VUE_APP_API_URL}products/${id}`)
+      .then((res) => {
+        commit("setProductDetail", res.data.data);
+        commit("setProductIsLoading", false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        commit("setProductIsLoading", false);
       });
   },
 
   async storeProduct({ commit }, product) {
-    commit('setProductIsCreating', true);
-    await axios.post(`${process.env.VUE_APP_API_URL}products`, product)
-      .then(res => {
-        commit('saveNewProducts', res.data.data);
-        commit('setProductIsCreating', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsCreating', false);
+    commit("setProductIsCreating", true);
+    await axios // TODO: Trocar axios por $http e adicionar o parâmetro "id" a query do $http
+      .post(`${process.env.VUE_APP_API_URL}products`, product)
+      .then((res) => {
+        commit("saveNewProducts", res.data.data);
+        commit("setProductIsCreating", false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        commit("setProductIsCreating", false);
       });
   },
 
   async updateProduct({ commit }, product) {
-    commit('setProductIsUpdating', true);
-    commit('setProductIsUpdating', true);
-    await axios.post(`${process.env.VUE_APP_API_URL}products/${product.id}?_method=PUT`, product)
-      .then(res => {
-        commit('saveUpdatedProduct', res.data.data);
-        commit('setProductIsUpdating', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsUpdating', false);
+    commit("setProductIsUpdating", true);
+    commit("setProductIsUpdating", true);
+    await axios // TODO: Trocar axios por $http e adicionar o parâmetro "id" a query do $http
+      .post(
+        `${process.env.VUE_APP_API_URL}products/${product.id}?_method=PUT`,
+        product
+      )
+      .then((res) => {
+        commit("saveUpdatedProduct", res.data.data);
+        commit("setProductIsUpdating", false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        commit("setProductIsUpdating", false);
       });
   },
 
-
   async deleteProduct({ commit }, id) {
-    commit('setProductIsDeleting', true);
-    await axios.delete(`${process.env.VUE_APP_API_URL}products/${id}`)
-      .then(res => {
-        commit('setDeleteProduct', res.data.data.id);
-        commit('setProductIsDeleting', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsDeleting', false);
+    commit("setProductIsDeleting", true);
+    await axios // TODO: Trocar axios por $http e adicionar o parâmetro "id" a query do $http
+      .delete(`${process.env.VUE_APP_API_URL}products/${id}`)
+      .then((res) => {
+        commit("setDeleteProduct", res.data.data.id);
+        commit("setProductIsDeleting", false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        commit("setProductIsDeleting", false);
       });
   },
 
   async fetchAllMarks({ commit }) {
-    commit('setProductIsLoading', true);
-    await axios.get(`${process.env.VUE_APP_API_URL}products/view/marks`)
-      .then(res => {
-        commit('setMarks', res.data.data);
-        commit('setProductIsLoading', false);
-      }).catch(err => {
-        console.log('error', err);
-        commit('setProductIsLoading', false);
+    commit("setProductIsLoading", true);
+    await axios // TODO: Trocar axios por $http e adicionar o parâmetro "id" a query do $http
+      .get(`${process.env.VUE_APP_API_URL}products/view/marks`)
+      .then((res) => {
+        commit("setMarks", res.data.data);
+        commit("setProductIsLoading", false);
+      })
+      .catch((err) => {
+        console.log("error", err);
+        commit("setProductIsLoading", false);
       });
   },
 
   updateProductInput({ commit }, e) {
-    commit('setProductDetailInput', e);
-  }
-}
+    // FIXME: utilizar v-model
+    commit("setProductDetailInput", e);
+  },
+};
 
-// mutations
+// mutations //TODO: Mutations deve estar em um arquivo separado
 const mutations = {
-  setProducts: (state, products) => {
-    state.products = products
+  [types.SET_PRODUCTS]: (state, payload) => {
+    state.products = payload;
   },
 
-  setProductsPaginated: (state, productsPaginatedData) => {
-    state.productsPaginatedData = productsPaginatedData
+  [types.SET_PRODUCTS_PAGINATED]: (state, payload) => {
+    state.productsPaginatedData = payload;
   },
 
-  setProductDetail: (state, product) => {
-    state.product = product
+  [types.SET_PRODUCT_DETAIL]: (state, payload) => {
+    state.product = payload;
   },
 
-  setDeleteProduct: (state, id) => {
-    state.productsPaginatedData.data.filter(x => x.id !== id);
+  [types.SET_DELETE_PRODUCT]: (state, id) => {
+    state.productsPaginatedData.data.filter((x) => x.id !== id);
   },
 
-  setProductDetailInput: (state, e) => {
-    let product = state.product;
-    product[e.target.name] = e.target.value;
-    state.product = product
+  [types.SET_PRODUCT_DETAIL_INPUT]: (state, e) => {
+    const product = state.product;
+    product[e.target.name] = e.target.value; // FIXME: utilizar v-model
+    state.product = product;
   },
 
   saveNewProducts: (state, product) => {
-    state.products.unshift(product)
+    state.products.unshift(product);
     state.createdData = product;
   },
 
   saveUpdatedProduct: (state, product) => {
-    state.products.unshift(product)
+    state.products.unshift(product);
     state.updatedData = product;
   },
 
   setProductIsLoading(state, isLoading) {
-    state.isLoading = isLoading
+    state.isLoading = isLoading;
   },
 
   setProductIsCreating(state, isCreating) {
-    state.isCreating = isCreating
+    state.isCreating = isCreating;
   },
 
   setProductIsUpdating(state, isUpdating) {
-    state.isUpdating = isUpdating
+    state.isUpdating = isUpdating;
   },
 
   setProductIsDeleting(state, isDeleting) {
-    state.isDeleting = isDeleting
+    state.isDeleting = isDeleting;
   },
 
   setMarks: (state, marks) => {
     state.marks = marks;
   },
-}
+};
 
 export default {
-  // namespaced: true,
   state,
   getters,
   actions,
-  mutations
-}
+  mutations,
+};
