@@ -1,17 +1,12 @@
-
-import { createStore, createLogger } from 'vuex';
-import product from './modules/Product';
-import auth from './modules/Auth';
-
-const debug = process.env.NODE_ENV !== 'production'
+import { createStore } from "vuex";
+import product from "./modules/Product";
+import auth from "./modules/Auth";
 
 const Store = createStore({
   modules: {
     auth,
-    product
+    product,
   },
-  strict: debug,
-  plugins: debug ? [createLogger()] : []
-})
+});
 
 export default Store;
